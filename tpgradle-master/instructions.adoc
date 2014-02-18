@@ -1,0 +1,80 @@
+= TP Gradle : instructions
+:doctype: book
+:imagesdir: images
+:stylesdir: stylesheets
+:stylesheet: foundation.css
+:toc2:
+:numbered:
+
+== Mise en place
+
+Créez un fichier build.gradle permettant de construire le projet avec gradlew build. La librairie JUnit 4.11 est nécessaire pour les tests. Elle est disponible dans le repo Maven central.
+
+== Javadoc
+
+Commencez par générer la javadoc du projet.
+
+Configurez ensuite le build afin que le titre de la javadoc soit +Super clock application API doc+, et que la documentation générée n'inclue pas la documentation de Main.java
+
+== Qualité du code
+
+Utilisez le plugin PMD pour vérifier la qualité du code. 
+
+Configurez le plugin pour utiliser les rulesets +'braces'+, +'naming'+ et +'basic'+.
+
+Configurez-le ensuite afin que le build réussisse même s'il y a des violations de règles. 
+
+Enfin, configurez-le pour qu'il analyse les sources principales, mais pas les sources des tests.
+
+== Utilisation de Joda-Time
+
+La classe +Clock.java+ utilise les classes +Date+ et +SimpleDateFormat+ du JDK. A la place, j'aimerais utiliser la librairie Joda Time, plus moderne et mieux conçue. Le code de la méthode +getTime()+ devrait être
+
+[source,java]
+----
+return DateTime.now().toString(DateTimeFormat.mediumTime());
+----
+
+Changez le code de la méthode, et adaptez la configuration du build pour que le code compile.
+
+Vérifiez que les tests unitaires passent toujours.
+
+== Génération de la documentation
+
+Assignez un numéro de version ('1.0' par exemple) à votre projet (indice: vous aurez besoin de modifier la propriété version de l'object +project+).
+
+Reconstruisez le projet et observez l'impact que ce numéro de version a sur le fichier jar généré.
+
+Ajouter une tâche permettant de copier tous les fichiers du répertoire +src/doc+ vers le répertoire +build/doc+. Les fichiers
+contiennent des références à la version du projet sous la forme +${version}+. Faites en sorte que, pendant la copie, ces références
+soient remplacées par la valeur de la version du projet.
+
+Faites en sorte que cette nouvelle tâche soit exécutée lorsqu'on lance la tâche +build+.
+
+== Construction incrémentale
+
+Exécutez la tâche +clean+. Exécutez ensuite la tâche +build+ une première fois, puis une deuxième fois. Que constatez-vous en
+examinant ce que Gradle écrit dans la console?
+
+Modifiez le code du test +ClockTest.java+ et exécutez la tâche +build+. Que constatez-vous cette fois? Pourquoi certaines tâches sont-elles
+marquées UP-TO-DATE et d'autres pas?
+
+Modifiez le code de +Clock.java+ et exécutez la tâche +build+. Que constatez-vous cette fois? Pourquoi certaines tâches sont-elles
+marquées UP-TO-DATE et d'autres pas? Pourquoi la tâche +test+ est-elle réexécutée?
+
+Trouvez dans la documentation de Gradle comment fonctionne ce mécanisme de build incrémental.
+
+== Construction d'une application
+
+Pour l'instant, Gradle construit un jar contenant les classes de notre application. Ce serait suffisant s'il s'agissait
+d'une simple librairie. Mais en l'occurrence, il s'agit d'une application Java exécutable, et pas d'une librairie. Utilisez le plugin
++application+ pour améliorer le build. Décrivez les tâches ajoutées au build par ce plugin, et ce qu'elles permettent de générer.
+
+== Dépendances
+
+Lorsqu'un projet grandit, il est parfois difficile de connaître l'ensemble des librairies utilisées par le projet, et de savoir
+pourquoi une librairie en particulier est nécessaire. Utilisez le plugin +project-report+ pour en savoir plus sur notre projet.
+
+Quelles sont les librairies utilisées à l'exécution des tests unitaires? Pourquoi hamcrest-core est-elle utilisée?
+
+Générez un rapport HTML des dépendances du projet, et examinez-le.
